@@ -1,0 +1,51 @@
+public class OppTaskHandler {
+    
+    public static Boolean isFirstTimefour = true;
+    public static void OppTaskHandlerMethod(List<Opportunity> OppList,Map<Id,Opportunity> OppMap)
+   	{
+        Set<Id> updateoppIds = new Set<Id>();
+        Map<Id,Task> taskMap = new Map<Id,Task>();
+        List<Task> updateTaskList =new List<Task>();
+        if(!OppList.isEmpty())
+        {
+             for(Opportunity opp: OppList)
+             {
+                 if(opp.StageName != OppMap.get(opp.Id).StageName){
+                     updateoppIds.add(opp.Id);
+                 }
+             }
+        }
+       
+        List<Task> taskList=[Select Id,WhatId,Description from Task where WhatId IN:updateoppIds];
+        if(!taskList.isEmpty())
+        {
+            for(Task t:taskList)
+            {
+                taskMap.put(t.WhatId,t);
+            }
+        }
+        if(!OppList.isEmpty())
+        {
+             for(Opportunity opp: OppList)
+             {
+                 if(taskMap.containsKey(opp.Id))
+                 {
+                     Task ta= taskMap.get(opp.Id);
+                     ta.Description = opp.StageName;
+                     updateTaskList.add(ta);
+                 }
+                 else{
+                     Task nt = new Task();
+                     nt.WhatId=opp.Id;
+                     nt.Description=opp.StageName;
+                     nt.Subject=opp.Name;
+                     updateTaskList.add(nt);
+                 }
+                 
+             }
+            if(!updateTaskList.isEmpty())
+                upsert updateTaskList;
+        }
+    }
+
+}
