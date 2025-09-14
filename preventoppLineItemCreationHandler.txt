@@ -1,0 +1,22 @@
+public class preventoppLineItemCreationHandler {
+     public static Boolean isFirstTimethree = true;
+    
+    public static void preventoppLineItemCreationHandlerMethod(List<OpportunityLineItem> OpportunityLineItemList)
+    {
+        Set<Id> OpportunityIds = new Set<Id>();
+        Set<Id> ProductIds = new Set<Id>();
+        Map<Id,Id> oppProductMap= New Map<Id,Id>();
+        for(OpportunityLineItem op:OpportunityLineItemList)
+        {
+            OpportunityIds.add(op.OpportunityId);
+            ProductIds.add(op.Product2Id);
+            oppProductMap.put(op.OpportunityId,op.Product2Id);
+        }
+        for(Id uid:oppProductMap.keyset()){
+            List<Opportunity> oppList=[Select Id,Opportunity_Product_Family__c From Opportunity where Id =: uid];
+            
+        }
+    }
+    
+
+}
