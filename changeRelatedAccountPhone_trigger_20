@@ -1,0 +1,39 @@
+trigger changeRelatedAccountPhone_trigger_20 on Contact (after update) {
+    
+    if(trigger.isAfter && trigger.isUpdate)
+    {
+        List<Contact> newconList = Trigger.new;
+        Map<Id,Contact> oldconMap = Trigger.oldMap;
+        Map<Id,String> conMap = new Map<Id,String>();
+        if(!newconList.isEmpty())
+        {
+            Set<Id> newConIds = new Set<Id>();
+            for(Contact con : newconList)
+            {
+                if(con.Phone != oldconMap.get(con.Id).Phone)
+                {
+                    newConIds.add(con.AccountId);
+                    conMap.put(con.AccountId,con.Phone);
+                }
+            }
+            
+            List<Account> accList=[Select Id,Phone From Account where Id IN: newConIds];
+            
+            
+            List<Account> updateToAccountList = new List<Account>();
+            
+			for(Account acc:accList)
+            {
+                acc.Phone = conMap.get(acc.Id);
+                updateToAccountList.add(acc);
+            }
+            if(!updateToAccountList.isEmpty()){
+                update updateToAccountList;
+            }
+            
+            
+        }
+        
+    }
+
+}
