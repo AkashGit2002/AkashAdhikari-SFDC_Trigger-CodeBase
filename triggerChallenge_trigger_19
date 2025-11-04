@@ -1,0 +1,28 @@
+trigger triggerChallenge_trigger_19 on Opportunity (before insert) {
+    
+    if(trigger.isBefore && trigger.isInsert)
+    {
+        Set<Id> oppIds = new Set<Id>();
+        for(Opportunity opp: Trigger.new)
+        {
+            oppIds.add(opp.AccountId);
+        }
+        
+        Map<Id,Account> accMap = new Map<Id,Account>([Select Id,Active__c From Account where Id IN : oppIds]);
+        
+        for(Opportunity opp : Trigger.new)
+        {
+            if(opp.AccountId != null)
+            {
+                Account acc= accMap.get(opp.AccountId);
+            
+                if(acc.Active__c != null && acc.Active__c =='No')
+                {
+                    opp.addError('Cannot create Opportunity because the related Account is marked as Inactive.');
+                }
+            }
+        }
+        
+    }
+
+}
