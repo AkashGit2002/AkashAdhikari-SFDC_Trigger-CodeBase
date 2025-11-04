@@ -1,0 +1,17 @@
+trigger triggerChallenge_trigger_16 on Opportunity (before insert) {
+    
+    if(Trigger.isBefore && Trigger.isInsert)
+    {
+        Set<Id> oppIds = new Set<Id>();
+        for(Opportunity opp: Trigger.new)
+        {
+            if(opp.CloseDate != null)
+            {
+                opp.CloseDate = Date.today();
+            }
+            
+        }
+        
+    }
+
+}
