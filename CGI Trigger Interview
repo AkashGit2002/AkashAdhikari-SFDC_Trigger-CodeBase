@@ -1,0 +1,19 @@
+check question: https://www.youtube.com/watch?v=CUsIbI5Gty8
+
+trigger setSalutationBasedOnContactName on Contact (before insert, before update) {
+    
+    if (Trigger.isBefore && (Trigger.isInsert || Trigger.isUpdate)) {
+        
+        for (Contact con : Trigger.new) {
+            // Directly compare the String value of the GenderIdentity field
+            if (con.GenderIdentity == 'Male') {
+                con.Salutation = 'Mr.';
+            } else if (con.GenderIdentity == 'Female') {
+                con.Salutation = 'Ms.';
+            } else {
+                con.Salutation = 'Mx.';
+            }
+        }
+    }
+}
+
