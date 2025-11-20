@@ -1,0 +1,34 @@
+trigger triggerChallenge_trigger_18 on Account (after update) {
+    
+    Switch on Trigger.operationType{
+        
+        when AFTER_UPDATE {
+            Set<Id> accIds = new Set<Id>();   
+            for(Account acc : Trigger.new)
+            {
+                Account oldRecord = Trigger.oldMap.get(acc.Id);
+                if(acc.AnnualRevenue != oldRecord.AnnualRevenue)
+                {
+                    accIds.add(acc.Id);
+                }
+            }
+            List<Opportunity> oppList =[Select AccountId,Amount From opportunity where AccountId IN :accIds];
+            Map<Id,Decimal> accMap = new Map<Id,Decimal>();
+            
+            for(Account acc : Trigger.new)
+            {
+                accMap.put(acc.Id, acc.AnnualRevenue);
+            }
+            List<Opportunity> updateOppList= new List<Opportunity>();
+            for(Opportunity opp : oppList)
+            {
+                opp.Amount = accMap.get(opp.AccountId);
+                updateOppList.add(opp);
+            }
+            update updateOppList;
+           
+        }
+        
+    }
+
+}
