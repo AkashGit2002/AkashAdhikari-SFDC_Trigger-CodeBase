@@ -1,0 +1,38 @@
+trigger CaseClosureTrigger on Case (before update) {
+    
+    set<Id> caseIds = new set<Id>();
+    Map<Id,Case> closedCaseMap = new Map<Id,Case>();
+    
+    for(Case c : Trigger.new)
+    {
+        Case oldMap = Trigger.OldMap.get(c.Id);
+        if(c.status == 'Closed' && oldMap.status !='Closed')
+        {
+            caseIds.add(c.Id);
+            closedCaseMap.put(c.Id,c);
+        }
+    }
+    
+    if(closedCaseMap.isEmpty()) return;
+    
+    List<Task> openTasks =[Select Id,whatId,subject From Task where whatId IN:caseIds and status !='complete' and IsClosed =false];
+    
+    List<Id> caseWithOpenTasks = new List<Id>();
+    
+    for(Task t: openTasks){
+        caseWithOpenTasks.add(t.WhatId);
+    }
+    
+    for(Id cid : caseWithOpenTasks)
+    {
+       closedCaseMap.get(cid).addError(
+            'Cannot close this Case. Please complete all open Tasks first.'
+        );
+
+    }
+    
+    
+    
+    
+
+}
